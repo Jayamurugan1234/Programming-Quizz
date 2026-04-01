@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS.QUIZ</title>
+</head>
+<body>
+
+    <div class="onee">
+    <div class="one">
+        <pre>  </pre>
+        <h2 class="two">Welcome you here to attend the Bootstrap Programming Language</h2>
+
+        <h2 id="question" class="twoo">Question Text</h2>
+
+        <ul class="options">
+            <li>
+                <input type="radio" name="answer" id="a" class="answer">
+                <label for="a" id="a_text">Answer</label>
+
+            </li>
+
+            <li>
+                <input type="radio" name="answer" id="b" class="answer">
+                <label for="b" id="b_text">Answer</label>
+
+            </li>
+
+            <li>
+                <input type="radio" name="answer" id="c" class="answer">
+                <label for="c" id="c_text">Answer</label>
+
+            </li>
+
+            <li>
+                <input type="radio" name="answer" id="d" class="answer">
+                <label for="d" id="d_text">Answer</label>
+
+            </li>
+        </ul>
+
+        <div id="feedback" class="feedback"></div>
+
+        <button id="submit">Next</button>
+
+
+    </div>
+    </div>
+
+    <script>
+        const quizData=[
+            {
+        question: "Which of the following is a correct way to declare a variable in JavaScript?",
+        a: "var myVar;",
+        b: "variable myVar;",
+        c: "v myVar;",
+        d: "letvar myVar;",
+        correct: "a"
+    },
+    {
+        question: "Which symbol is used for comments in JavaScript?",
+        a: "// for single line, /* */ for multi-line",
+        b: "<!-- -->",
+        c: "# for single line, /* */ for multi-line",
+        d: "** for single line",
+        correct: "a"
+    },
+    {
+        question: "Which of the following is a correct way to write a function in JavaScript?",
+        a: "function myFunc() {}",
+        b: "def myFunc() {}",
+        c: "func myFunc() {}",
+        d: "function:myFunc() {}",
+        correct: "a"
+    },
+    {
+        question: "What will `typeof []` return in JavaScript?",
+        a: "array",
+        b: "object",
+        c: "list",
+        d: "undefined",
+        correct: "b"
+    },
+    {
+        question: "Which method is used to add an element at the end of an array?",
+        a: "push()",
+        b: "pop()",
+        c: "shift()",
+        d: "unshift()",
+        correct: "a"
+    },
+    {
+        question: "Which operator is used for strict equality in JavaScript?",
+        a: "==",
+        b: "=",
+        c: "===",
+        d: "!=",
+        correct: "c"
+    },
+    {
+        question: "What is the output of `console.log(2 + '2');`?",
+        a: "4",
+        b: "22",
+        c: "NaN",
+        d: "Error",
+        correct: "b"
+    },
+    {
+        question: "Which of the following is NOT a JavaScript data type?",
+        a: "Boolean",
+        b: "Undefined",
+        c: "Float",
+        d: "Symbol",
+        correct: "c"
+    },
+    {
+        question: "How can you convert a string '123' to a number in JavaScript?",
+        a: "Number('123')",
+        b: "parseInt('123')",
+        c: "Both A and B",
+        d: "toNumber('123')",
+        correct: "c"
+    },
+    {
+        question: "Which of the following is used to schedule a function to run after a delay?",
+        a: "setInterval()",
+        b: "setTimeout()",
+        c: "setDelay()",
+        d: "delayFunction()",
+        correct: "b"
+    },
+    {
+        question: "Which of these will check if a value is NaN?",
+        a: "isNaN(value)",
+        b: "Number.isNaN(value)",
+        c: "Both A and B",
+        d: "value === NaN",
+        correct: "c"
+    },
+    {
+        question: "Which of these keywords is used to create a constant variable?",
+        a: "let",
+        b: "const",
+        c: "var",
+        d: "constant",
+        correct: "b"
+    },
+    {
+        question: "Which of the following methods can be used to combine two arrays?",
+        a: "merge()",
+        b: "concat()",
+        c: "append()",
+        d: "combine()",
+        correct: "b"
+    },
+    {
+        question: "How do you write an arrow function in JavaScript?",
+        a: "function() => {}",
+        b: "() => {}",
+        c: "=> function() {}",
+        d: "func => {}",
+        correct: "b"
+    },
+    {
+        question: "Which of the following is used to access a property of an object?",
+        a: "object.property",
+        b: "object['property']",
+        c: "Both A and B",
+        d: "object->property",
+        correct: "c"
+    }
+
+        ];
+
+         const questionEl = document.getElementById("question");
+const answerEls = document.querySelectorAll(".answer");
+const a_text = document.getElementById("a_text");
+const b_text = document.getElementById("b_text");
+const c_text = document.getElementById("c_text");
+const d_text = document.getElementById("d_text");
+const submitBtn = document.getElementById("submit");
+const feedbackEl = document.getElementById("feedback");
+
+let currentQuiz = 0;
+let score = 0;
+let answered = false;
+
+loadQuiz();
+
+
+
+     function loadQuiz() {
+    deselectAnswers();
+    feedbackEl.innerHTML = "";
+
+    answerEls.forEach(el => {
+        el.disabled = false;
+        const label = document.getElementById(el.id + "_text");
+        label.classList.remove("correct", "wrong");
+        label.textContent = "";   
+    });
+
+    const currentQuizData = quizData[currentQuiz];
+    questionEl.innerText = currentQuizData.question;
+    a_text.textContent = currentQuizData.a;
+    b_text.textContent = currentQuizData.b;
+    c_text.textContent = currentQuizData.c;
+    d_text.textContent = currentQuizData.d;
+}
+
+
+
+
+    function deselectAnswers() {
+        answerEls.forEach(answerEl => answerEl.checked = false);
+    }
+
+    function getSelected() {
+        let answer;
+        answerEls.forEach(answerEl => {
+            if (answerEl.checked) {
+                answer = answerEl.id;
+            }
+        });
+        return answer;
+    }
+
+    submitBtn.addEventListener("click", () => {
+    const answer = getSelected();
+    if (!answer) return;
+
+    
+    if (answered) {
+        currentQuiz++;
+        answered = false;
+        submitBtn.innerText = "Submit";
+
+        if (currentQuiz < quizData.length) {
+            loadQuiz();
+        } else {
+            document.querySelector(".one").innerHTML = `
+                <h2>You answered ${score} out of ${quizData.length} questions correctly</h2>
+                <button class="restart-btn" onclick="location.reload()">Restart Quiz</button>
+            `;
+        }
+        return;
+    }
+
+   
+    answered = true;
+    submitBtn.innerText = "Next";
+
+    const correctAnswer = quizData[currentQuiz].correct;
+
+    answerEls.forEach(el => {
+        const label = document.getElementById(el.id + "_text");
+
+        if (el.id === correctAnswer) {
+            label.insertAdjacentHTML("beforeend", ` <span class="tick">✔</span>`);
+
+            label.classList.add("correct");
+        }
+
+        if (el.checked && el.id !== correctAnswer) {
+           label.insertAdjacentHTML("beforeend", ` <span class="tick">✖</span>`);
+
+            label.classList.add("wrong");
+        }
+
+        el.disabled = true;
+    });
+
+    if (answer === correctAnswer) {
+        score++;
+        feedbackEl.innerHTML = `<p class="correct">Correct Answer ✔</p>`;
+    } else {
+       feedbackEl.innerHTML = `
+    <p class="wrong">
+        Wrong Answer ✖ <br>
+        Correct Answer is: <b></b>
+    </p>`;
+
+feedbackEl.querySelector("b").textContent =
+    quizData[currentQuiz][correctAnswer];
+
+    }
+});
+    </script>
+</body>
+</html>
+<style>
+
+
+
+@media (min-width: 320px){
+
+    
+    .one{
+        background-color: papayawhip;
+        height: 165vh;
+        align-items: center;
+        display: flex;
+    flex-direction: column;
+        
+    }
+
+    .two{
+        text-align: center;
+        font-size: 35px;
+        /* margin-top: 60px; */
+    }
+
+    .twoo{
+        margin-left: 15px;
+    }
+    
+
+    ul {
+            list-style: none;
+            padding: 0;
+        }
+         ul li {
+            margin: 10px 0;
+        }
+
+        .options li {
+    display: grid;
+    grid-template-columns: 30px 1fr; 
+    align-items: center;
+    /* justify-content: center; */
+    gap: 10px;
+    margin: 12px 0;
+    font-size: 18px;
+}
+.options {
+    list-style: none;
+    padding: 0;
+    margin-top: 0px;
+    max-width: 500px;
+    margin-right: auto; 
+     margin-left: auto;
+    margin-right: auto;
+}
+input[type="radio"] {
+    justify-self: center;  
+    transform: scale(1.2);
+    cursor: pointer;
+}
+label {
+    cursor: pointer;
+}
+
+          button {
+             width: 110px;
+            
+            padding: 10px;
+            background: #007bff;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 8px;
+            /* margin-top: 10px; */
+
+        }
+        button:hover {
+    background-color: #0056b3;
+}
+.restart-btn{
+    width: 150px;
+}
+.correct {
+    color: green;
+    font-weight: bold;
+}
+
+.wrong {
+    color: red;
+    font-weight: bold;
+}
+
+.feedback {
+    margin-top: 25px;
+    padding: 10px;
+    text-align: center;
+    font-size: 20px;
+}
+
+.tick {
+    margin-left: 10px;
+    font-size: 20px;
+}
+    }
+
+    @media (min-width: 375px){
+
+    
+    .one{
+        background-color: papayawhip;
+        height: 155vh;
+        align-items: center;
+        display: flex;
+    flex-direction: column;
+        
+    }
+
+    .two{
+        text-align: center;
+        font-size: 35px;
+        /* margin-top: 60px; */
+    }
+    
+    .twoo{
+        margin-left: 15px;
+    }
+
+    ul {
+            list-style: none;
+            padding: 0;
+        }
+         ul li {
+            margin: 10px 0;
+        }
+
+        .options li {
+    display: grid;
+    grid-template-columns: 30px 1fr; 
+    align-items: center;
+    /* justify-content: center; */
+    gap: 10px;
+    margin: 12px 0;
+    font-size: 18px;
+}
+.options {
+    list-style: none;
+    padding: 0;
+    margin-top: 0px;
+    max-width: 500px;
+    margin-right: auto; 
+     margin-left: auto;
+    margin-right: auto;
+}
+input[type="radio"] {
+    justify-self: center;  
+    transform: scale(1.2);
+    cursor: pointer;
+}
+label {
+    cursor: pointer;
+}
+
+          button {
+             width: 110px;
+            
+            padding: 10px;
+            background: #007bff;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 8px;
+            /* margin-top: 10px; */
+
+        }
+        button:hover {
+    background-color: #0056b3;
+}
+.restart-btn{
+    width: 150px;
+}
+.correct {
+    color: green;
+    font-weight: bold;
+}
+
+.wrong {
+    color: red;
+    font-weight: bold;
+}
+
+.feedback {
+    margin-top: 25px;
+    padding: 10px;
+    text-align: center;
+    font-size: 20px;
+}
+
+.tick {
+    margin-left: 10px;
+    font-size: 20px;
+}
+    }
+
+    @media (min-width: 425px){
+
+    
+    .one{
+        background-color: papayawhip;
+        height: 145vh;
+        align-items: center;
+        display: flex;
+    flex-direction: column;
+        
+    }
+
+    .two{
+        text-align: center;
+        font-size: 35px;
+        /* margin-top: 60px; */
+    }
+    
+    .twoo{
+        margin-left: 15px;
+    }
+
+    ul {
+            list-style: none;
+            padding: 0;
+        }
+         ul li {
+            margin: 10px 0;
+        }
+
+        .options li {
+    display: grid;
+    grid-template-columns: 30px 1fr; 
+    align-items: center;
+    /* justify-content: center; */
+    gap: 10px;
+    margin: 12px 0;
+    font-size: 18px;
+}
+.options {
+    list-style: none;
+    padding: 0;
+    margin-top: 0px;
+    max-width: 500px;
+    margin-right: auto; 
+     margin-left: auto;
+    margin-right: auto;
+}
+input[type="radio"] {
+    justify-self: center;  
+    transform: scale(1.2);
+    cursor: pointer;
+}
+label {
+    cursor: pointer;
+}
+
+          button {
+             width: 110px;
+            
+            padding: 10px;
+            background: #007bff;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 8px;
+            /* margin-top: 10px; */
+
+        }
+        button:hover {
+    background-color: #0056b3;
+}
+.restart-btn{
+    width: 150px;
+}
+.correct {
+    color: green;
+    font-weight: bold;
+}
+
+.wrong {
+    color: red;
+    font-weight: bold;
+}
+
+.feedback {
+    margin-top: 25px;
+    padding: 10px;
+    text-align: center;
+    font-size: 20px;
+}
+
+.tick {
+    margin-left: 10px;
+    font-size: 20px;
+}
+    }
+
+
+    @media (min-width: 768px){
+
+    
+    .one{
+        background-color: papayawhip;
+        height: 100vh;
+        align-items: center;
+        display: flex;
+    flex-direction: column;
+        
+    }
+
+    .two{
+        text-align: center;
+        font-size: 35px;
+        /* margin-top: 60px; */
+    }
+    
+    .twoo{
+        margin-left: 15px;
+    }
+
+    ul {
+            list-style: none;
+            padding: 0;
+        }
+         ul li {
+            margin: 10px 0;
+        }
+
+        .options li {
+    display: grid;
+    grid-template-columns: 30px 1fr; 
+    align-items: center;
+    /* justify-content: center; */
+    gap: 10px;
+    margin: 12px 0;
+    font-size: 18px;
+}
+.options {
+    list-style: none;
+    padding: 0;
+    margin-top: 0px;
+    max-width: 500px;
+    margin-right: auto; 
+     margin-left: auto;
+    margin-right: auto;
+}
+input[type="radio"] {
+    justify-self: center;  
+    transform: scale(1.2);
+    cursor: pointer;
+}
+label {
+    cursor: pointer;
+}
+
+          button {
+             width: 110px;
+            
+            padding: 10px;
+            background: #007bff;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 8px;
+            /* margin-top: 10px; */
+
+        }
+        button:hover {
+    background-color: #0056b3;
+}
+.restart-btn{
+    width: 150px;
+}
+.correct {
+    color: green;
+    font-weight: bold;
+}
+
+.wrong {
+    color: red;
+    font-weight: bold;
+}
+
+.feedback {
+    margin-top: 25px;
+    padding: 10px;
+    text-align: center;
+    font-size: 20px;
+}
+
+.tick {
+    margin-left: 10px;
+    font-size: 20px;
+}
+    }
+
+
+    @media (min-width: 1024px){
+
+    
+    .one{
+        background-color: papayawhip;
+        height: 105vh;
+        align-items: center;
+        display: flex;
+    flex-direction: column;
+        
+    }
+
+    .two{
+        text-align: center;
+        font-size: 35px;
+        margin-top: 60px;
+    }
+    
+
+    ul {
+            list-style: none;
+            padding: 0;
+        }
+         ul li {
+            margin: 10px 0;
+        }
+
+        .options li {
+    display: grid;
+    grid-template-columns: 30px 1fr; 
+    align-items: center;
+    /* justify-content: center; */
+    gap: 10px;
+    margin: 12px 0;
+    font-size: 18px;
+}
+.options {
+    list-style: none;
+    padding: 0;
+    margin-top: 0px;
+    max-width: 500px;
+    margin-right: auto; 
+     margin-left: auto;
+    margin-right: auto;
+}
+input[type="radio"] {
+    justify-self: center;  
+    transform: scale(1.2);
+    cursor: pointer;
+}
+label {
+    cursor: pointer;
+}
+
+          button {
+             width: 110px;
+            
+            padding: 10px;
+            background: #007bff;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 8px;
+            /* margin-top: 10px; */
+
+        }
+        button:hover {
+    background-color: #0056b3;
+}
+.restart-btn{
+    width: 150px;
+}
+.correct {
+    color: green;
+    font-weight: bold;
+}
+
+.wrong {
+    color: red;
+    font-weight: bold;
+}
+
+.feedback {
+    margin-top: 25px;
+    padding: 10px;
+    text-align: center;
+    font-size: 20px;
+}
+
+.tick {
+    margin-left: 10px;
+    font-size: 20px;
+}
+    }
+</style>

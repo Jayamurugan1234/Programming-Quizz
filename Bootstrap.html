@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOOTSTRAP.QUIZ</title>
+</head>
+<body>
+
+    <div class="onee">
+    <div class="one">
+        <pre>  </pre>
+        <h2 class="two">Welcome you here to attend the Bootstrap Programming Language</h2>
+
+        <h2 id="question" class="twoo">Question Text</h2>
+
+        <ul class="options">
+            <li>
+                <input type="radio" name="answer" id="a" class="answer">
+                <label for="a" id="a_text">Answer</label>
+
+            </li>
+
+            <li>
+                <input type="radio" name="answer" id="b" class="answer">
+                <label for="b" id="b_text">Answer</label>
+
+            </li>
+
+            <li>
+                <input type="radio" name="answer" id="c" class="answer">
+                <label for="c" id="c_text">Answer</label>
+
+            </li>
+
+            <li>
+                <input type="radio" name="answer" id="d" class="answer">
+                <label for="d" id="d_text">Answer</label>
+
+            </li>
+        </ul>
+        <div id="feedback" class="feedback"></div>
+
+
+        <button id="submit">Next</button>
+
+
+    </div>
+    </div>
+
+    <script>
+        const quizData=[
+            {
+    question: "What is Bootstrap?",
+    a: "A JavaScript library",
+    b: "A CSS framework",
+    c: "A backend framework",
+    d: "A database system",
+    correct: "b"
+  },
+  {
+    question: "Which class is used to create a responsive fixed-width container in Bootstrap?",
+    a: ".container-fluid",
+    b: ".container",
+    c: ".container-fixed",
+    d: ".container-responsive",
+    correct: "b"
+  },
+  {
+    question: "How do you include Bootstrap CSS in your project?",
+    a: "By adding a <script> tag",
+    b: "By linking the Bootstrap CSS file in the <head>",
+    c: "By writing Bootstrap CSS manually",
+    d: "Bootstrap CSS is automatically included",
+    correct: "b"
+  },
+  {
+    question: "Which class makes a button look primary in Bootstrap?",
+    a: ".btn-main",
+    b: ".btn-primary",
+    c: ".btn-default",
+    d: ".button-primary",
+    correct: "b"
+  },
+  {
+    question: "How do you create a grid with 3 equal columns in Bootstrap?",
+    a: "Using `.col-4` inside a `.row`",
+    b: "Using `.col-3` inside a `.row`",
+    c: "Using `.col-6` inside a `.row`",
+    d: "Using `.grid-3`",
+    correct: "a"
+  },
+  {
+    question: "Which class hides an element on small screens but shows on medium and larger screens?",
+    a: ".d-none .d-md-block",
+    b: ".hide-sm .show-md",
+    c: ".d-hide .d-show-md",
+    d: ".d-sm-none .d-md-block",
+    correct: "a"
+  },
+  {
+    question: "Bootstrap is based on which CSS preprocessor?",
+    a: "Sass",
+    b: "Less",
+    c: "Stylus",
+    d: "PostCSS",
+    correct: "b"
+  },
+  {
+    question: "Which class is used to add a responsive image in Bootstrap?",
+    a: ".img-responsive",
+    b: ".img-fluid",
+    c: ".img-scale",
+    d: ".img-bootstrap",
+    correct: "b"
+  },
+  {
+    question: "Which Bootstrap component is used for navigation links?",
+    a: "Navbar",
+    b: "Menu",
+    c: "Header",
+    d: "Navlist",
+    correct: "a"
+  },
+  {
+    question: "How do you add spacing between Bootstrap columns?",
+    a: "Using `.spacing` class",
+    b: "Using `.gap` property in CSS",
+    c: "Using `.g-*` classes (e.g., `.g-3`)",
+    d: "Using margin utilities",
+    correct: "c"
+  }
+
+        ];
+
+         const questionEl = document.getElementById("question");
+const answerEls = document.querySelectorAll(".answer");
+const a_text = document.getElementById("a_text");
+const b_text = document.getElementById("b_text");
+const c_text = document.getElementById("c_text");
+const d_text = document.getElementById("d_text");
+const submitBtn = document.getElementById("submit");
+const feedbackEl = document.getElementById("feedback");
+
+let currentQuiz = 0;
+let score = 0;
+let answered = false;
+
+loadQuiz();
+
+
+
+     function loadQuiz() {
+    deselectAnswers();
+    feedbackEl.innerHTML = "";
+
+    answerEls.forEach(el => {
+        el.disabled = false;
+        const label = document.getElementById(el.id + "_text");
+        label.classList.remove("correct", "wrong");
+        label.textContent = "";   
+    });
+
+    const currentQuizData = quizData[currentQuiz];
+    questionEl.innerText = currentQuizData.question;
+    a_text.textContent = currentQuizData.a;
+    b_text.textContent = currentQuizData.b;
+    c_text.textContent = currentQuizData.c;
+    d_text.textContent = currentQuizData.d;
+}
+
+
+
+
+    function deselectAnswers() {
+        answerEls.forEach(answerEl => answerEl.checked = false);
+    }
+
+    function getSelected() {
+        let answer;
+        answerEls.forEach(answerEl => {
+            if (answerEl.checked) {
+                answer = answerEl.id;
+            }
+        });
+        return answer;
+    }
+
+    submitBtn.addEventListener("click", () => {
+    const answer = getSelected();
+    if (!answer) return;
+
+    
+    if (answered) {
+        currentQuiz++;
+        answered = false;
+        submitBtn.innerText = "Submit";
+
+        if (currentQuiz < quizData.length) {
+            loadQuiz();
+        } else {
+            document.querySelector(".one").innerHTML = `
+                <h2>You answered ${score} out of ${quizData.length} questions correctly</h2>
+                <button class="restart-btn" onclick="location.reload()">Restart Quiz</button>
+            `;
+        }
+        return;
+    }
+
+   
+    answered = true;
+    submitBtn.innerText = "Next";
+
+    const correctAnswer = quizData[currentQuiz].correct;
+
+    answerEls.forEach(el => {
+        const label = document.getElementById(el.id + "_text");
+
+        if (el.id === correctAnswer) {
+            label.insertAdjacentHTML("beforeend", ` <span class="tick">✔</span>`);
+
+            label.classList.add("correct");
+        }
+
+        if (el.checked && el.id !== correctAnswer) {
+           label.insertAdjacentHTML("beforeend", ` <span class="tick">✖</span>`);
+
+            label.classList.add("wrong");
+        }
+
+        el.disabled = true;
+    });
+
+    if (answer === correctAnswer) {
+        score++;
+        feedbackEl.innerHTML = `<p class="correct">Correct Answer ✔</p>`;
+    } else {
+       feedbackEl.innerHTML = `
+    <p class="wrong">
+        Wrong Answer ✖ <br>
+        Correct Answer is: <b></b>
+    </p>`;
+
+feedbackEl.querySelector("b").textContent =
+    quizData[currentQuiz][correctAnswer];
+
+    }
+});
+    </script>
+</body>
+</html>
+<style>
+
+    @media (min-width: 425px){
+
+        .one{
+        background-color: papayawhip;
+        height: 100vh;
+        align-items: center;
+        display: flex;
+    flex-direction: column;
+        
+    }
+
+    .two{
+        text-align: center;
+        font-size: 35px;
+        /* margin-top: 60px; */
+    }
+     .twoo{
+        margin-left: 15px;
+    }
+    
+
+    ul {
+            list-style: none;
+            padding: 0;
+        }
+         ul li {
+            margin: 10px 0;
+        }
+
+        .options li {
+    display: grid;
+    grid-template-columns: 30px 1fr; 
+    align-items: center;
+    /* justify-content: center; */
+    gap: 10px;
+    margin: 12px 0;
+    font-size: 18px;
+}
+.options {
+    list-style: none;
+    padding: 0;
+    margin-top: 0px;
+    max-width: 500px;
+    margin-right: auto; 
+     margin-left: auto;
+    margin-right: auto;
+}
+input[type="radio"] {
+    justify-self: center;  
+    transform: scale(1.2);
+    cursor: pointer;
+}
+label {
+    cursor: pointer;
+}
+
+        button {
+             width: 110px;
+            
+            padding: 10px;
+            background: #007bff;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 8px;
+            /* margin-top: 10px; */
+
+        }
+        button:hover {
+    background-color: #0056b3;
+}
+.restart-btn{
+    width: 150px;
+}
+.correct {
+    color: green;
+    font-weight: bold;
+}
+
+.wrong {
+    color: red;
+    font-weight: bold;
+}
+
+.feedback {
+    margin-top: 25px;
+    padding: 10px;
+    text-align: center;
+    font-size: 20px;
+}
+
+.tick {
+    margin-left: 10px;
+    font-size: 20px;
+}
+    }
+
+
+    @media (min-width: 320px){
+
+        .one{
+        background-color: papayawhip;
+        height: 155vh;
+        align-items: center;
+        display: flex;
+    flex-direction: column;
+        
+    }
+
+    .two{
+        text-align: center;
+        font-size: 35px;
+        /* margin-top: 60px; */
+    }
+
+     .twoo{
+        margin-left: 15px;
+    }
+    
+
+    ul {
+            list-style: none;
+            padding: 0;
+        }
+         ul li {
+            margin: 10px 0;
+        }
+
+        .options li {
+    display: grid;
+    grid-template-columns: 30px 1fr; 
+    align-items: center;
+    /* justify-content: center; */
+    gap: 10px;
+    margin: 12px 0;
+    font-size: 18px;
+}
+.options {
+    list-style: none;
+    padding: 0;
+    margin-top: 0px;
+    max-width: 500px;
+    margin-right: auto; 
+     margin-left: auto;
+    margin-right: auto;
+}
+input[type="radio"] {
+    justify-self: center;  
+    transform: scale(1.2);
+    cursor: pointer;
+}
+label {
+    cursor: pointer;
+}
+
+        button {
+             width: 110px;
+            
+            padding: 10px;
+            background: #007bff;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 8px;
+            /* margin-top: 10px; */
+
+        }
+        button:hover {
+    background-color: #0056b3;
+}
+.restart-btn{
+    width: 150px;
+}
+.correct {
+    color: green;
+    font-weight: bold;
+}
+
+.wrong {
+    color: red;
+    font-weight: bold;
+}
+
+.feedback {
+    margin-top: 25px;
+    padding: 10px;
+    text-align: center;
+    font-size: 20px;
+}
+
+.tick {
+    margin-left: 10px;
+    font-size: 20px;
+}
+
+@media (min-width: 375px){
+
+        .one{
+        background-color: papayawhip;
+        height: 145vh;
+        align-items: center;
+        display: flex;
+    flex-direction: column;
+        
+    }
+
+    .two{
+        text-align: center;
+        font-size: 35px;
+        /* margin-top: 60px; */
+    }
+
+     .twoo{
+        margin-left: 15px;
+    }
+    
+
+    ul {
+            list-style: none;
+            padding: 0;
+        }
+         ul li {
+            margin: 10px 0;
+        }
+
+        .options li {
+    display: grid;
+    grid-template-columns: 30px 1fr; 
+    align-items: center;
+    /* justify-content: center; */
+    gap: 10px;
+    margin: 12px 0;
+    font-size: 18px;
+}
+.options {
+    list-style: none;
+    padding: 0;
+    margin-top: 0px;
+    max-width: 500px;
+    margin-right: auto; 
+     margin-left: auto;
+    margin-right: auto;
+}
+input[type="radio"] {
+    justify-self: center;  
+    transform: scale(1.2);
+    cursor: pointer;
+}
+label {
+    cursor: pointer;
+}
+
+        button {
+             width: 110px;
+            
+            padding: 10px;
+            background: #007bff;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 8px;
+            /* margin-top: 10px; */
+
+        }
+        button:hover {
+    background-color: #0056b3;
+}
+.restart-btn{
+    width: 150px;
+}
+.correct {
+    color: green;
+    font-weight: bold;
+}
+
+.wrong {
+    color: red;
+    font-weight: bold;
+}
+
+.feedback {
+    margin-top: 25px;
+    padding: 10px;
+    text-align: center;
+    font-size: 20px;
+}
+
+.tick {
+    margin-left: 10px;
+    font-size: 20px;
+}
+
+
+@media (min-width: 768px){
+
+        .one{
+        background-color: papayawhip;
+        height: 100vh;
+        align-items: center;
+        display: flex;
+    flex-direction: column;
+        
+    }
+
+    .two{
+        text-align: center;
+        font-size: 35px;
+        /* margin-top: 60px; */
+    }
+    
+     .twoo{
+        margin-left: 15px;
+    }
+
+    ul {
+            list-style: none;
+            padding: 0;
+        }
+         ul li {
+            margin: 10px 0;
+        }
+
+        .options li {
+    display: grid;
+    grid-template-columns: 30px 1fr; 
+    align-items: center;
+    /* justify-content: center; */
+    gap: 10px;
+    margin: 12px 0;
+    font-size: 18px;
+}
+.options {
+    list-style: none;
+    padding: 0;
+    margin-top: 0px;
+    max-width: 500px;
+    margin-right: auto; 
+     margin-left: auto;
+    margin-right: auto;
+}
+input[type="radio"] {
+    justify-self: center;  
+    transform: scale(1.2);
+    cursor: pointer;
+}
+label {
+    cursor: pointer;
+}
+
+        button {
+             width: 110px;
+            
+            padding: 10px;
+            background: #007bff;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 8px;
+            /* margin-top: 10px; */
+
+        }
+        button:hover {
+    background-color: #0056b3;
+}
+.restart-btn{
+    width: 150px;
+}
+.correct {
+    color: green;
+    font-weight: bold;
+}
+
+.wrong {
+    color: red;
+    font-weight: bold;
+}
+
+.feedback {
+    margin-top: 25px;
+    padding: 10px;
+    text-align: center;
+    font-size: 20px;
+}
+
+.tick {
+    margin-left: 10px;
+    font-size: 20px;
+}
+    }
+    }
+
+
+     @media (min-width: 1024px){
+
+     
+    .one{
+        background-color: papayawhip;
+        height: 105vh;
+        align-items: center;
+        display: flex;
+    flex-direction: column;
+        
+    }
+
+    .two{
+        text-align: center;
+        font-size: 35px;
+        margin-top: 60px;
+    }
+    
+
+    ul {
+            list-style: none;
+            padding: 0;
+        }
+         ul li {
+            margin: 10px 0;
+        }
+
+        .options li {
+    display: grid;
+    grid-template-columns: 30px 1fr; 
+    align-items: center;
+    /* justify-content: center; */
+    gap: 10px;
+    margin: 12px 0;
+    font-size: 18px;
+}
+.options {
+    list-style: none;
+    padding: 0;
+    margin-top: 0px;
+    max-width: 500px;
+    margin-right: auto; 
+     margin-left: auto;
+    margin-right: auto;
+}
+input[type="radio"] {
+    justify-self: center;  
+    transform: scale(1.2);
+    cursor: pointer;
+}
+label {
+    cursor: pointer;
+}
+
+        button {
+             width: 110px;
+            
+            padding: 10px;
+            background: #007bff;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 8px;
+            /* margin-top: 10px; */
+
+        }
+        button:hover {
+    background-color: #0056b3;
+}
+.restart-btn{
+    width: 150px;
+}
+.correct {
+    color: green;
+    font-weight: bold;
+}
+
+.wrong {
+    color: red;
+    font-weight: bold;
+}
+
+.feedback {
+    margin-top: 25px;
+    padding: 10px;
+    text-align: center;
+    font-size: 20px;
+}
+
+.tick {
+    margin-left: 10px;
+    font-size: 20px;
+}
+     }
+    }
+</style>
